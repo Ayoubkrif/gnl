@@ -80,29 +80,31 @@ char	*ft_strchr(const char *s, int c)
 #include<stdio.h>
 char	*get_next_line(int fd)
 {
-	static char	*s;
-	char *r;
-	char	*temp;
-	int		n;
+	static char	s[BUFFER_SIZE + 1];
+	char		*r;
+	char		*temp;
+	int			n;
 
-	
-	printf("la string restante est |%s|\n", s);
+	printf("la string restante est |%s|*%llu*\n", s, s);
 	r = calloc(sizeof(char), 1);
-	if (!s)
-		s = calloc(sizeof(char), BUFFER_SIZE + 1);
-	else if (strchr(s, '\n'))
+	printf("Malloc !");
+	if (strchr(s, '\n')) //check de la presence d'un nl
 	{
-		r = ft_substr(s ,strchr(s, '\n') - s + 1, 1000);
+		r = ft_substr(s ,strchr(s, '\n') - s + 1, BUFFER_SIZE);
+		printf("Malloc !");
+		//tronque le premier nl
 	}
-	printf("la string restante est  devenue |%s|\n", r);
+	printf("la string restante est  devenue |%s|\n", temp);
 	while (read(fd, s, BUFFER_SIZE) > 0)
 	{
 		s[BUFFER_SIZE] = 0;
 		r = ft_strjoin(r, s);
+		printf("Malloc !");
 		if (strchr(r, '\n'))
 		{
 			
 			r = ft_substr(r, 0, strchr(r, '\n') - r + 1);
+			printf("Malloc !");
 			printf("la string retournee est |%s|\n\n", r);
 			return (r);
 		}

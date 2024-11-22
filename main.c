@@ -11,10 +11,10 @@ int main(void)
 		return(1);
 	printf("%d\n",BUFFER_SIZE);
 	s = get_next_line(fd);
-	//printf("1: |%s|\n", s);
+	printf("String n*1: |%s|\n\n\n", s);
 	free(s);
 	s = get_next_line(fd);
-	//printf("2: |%s|\n", s);
+	printf("String n*2: |%s|\n\n\n", s);
 	free(s);
 	close(fd);
 	return 0;
