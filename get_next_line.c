@@ -1,114 +1,65 @@
-#include "get_next_line.h"
-#include <string.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aykrifa <aykrifa@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/23 09:35:20 by aykrifa           #+#    #+#             */
+/*   Updated: 2024/11/23 11:40:37 by aykrifa          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-static void	ft_join(char const *s1, char const *s2, char **r)
+#include "get_next_line.h"
+
+char	*cleanbuff(char *s, char *r)
 {
 	int	i;
 	int	j;
 
-	i = 0;
 	j = 0;
-	while (s1[i])
-	{
-		(*r)[i] = s1[i];
-		i++;
-	}
-	while (s2[j])
-	{
-		(*r)[i + j] = s2[j];
-		j++;
-	}
-	(*r)[i + j] = '\0';
-}
-
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	char	*r;
-	size_t	i;
-	size_t	j;
-
 	i = 0;
-	j = 0;
-	while (s1[i])
-		i++;
-	while (s2[j])
-		j++;
-	r = (char *)malloc(sizeof(char) * (1 + i + j));
-	if (!r)
-		return (NULL);
-	ft_join(s1, s2, &r);
-	return (r);
-}
-
-char	*ft_substr(char const *s, unsigned int start, size_t len)
-{
-	size_t			i;
-	char			*r;
-	unsigned int	smax;
-
-	i = 0;
-	smax = 0;
-	while (s[smax])
-		smax++;
-	while (smax >= start && (s + start)[i] && i < len)
-		i++;
-	r = (char *)malloc(sizeof(char) * (i + 1));
-	if (!r)
-		return (NULL);
-	i = 0;
-	while (smax >= start && (s + start)[i] && i < len)
+	if (ft_strchr(s,'\n'))
 	{
-		r[i] = (s + start)[i];
-		i++;
-	}
-	r[i] = '\0';
-	return (r);
-}
-
-char	*ft_strchr(const char *s, int c)
-{
-	int	i;
-
-	i = 0;
-	while (s[i] && s[i] != (unsigned char)c)
-		i++;
-	if (s[i] == (unsigned char)c)
-		return ((char *)(s + i));
-	return (NULL);
-}
-
-#include<stdio.h>
-char	*get_next_line(int fd)
-{
-	static char	s[BUFFER_SIZE + 1];
-	char		*r;
-	char		*temp;
-	int			n;
-
-	printf("la string restante est |%s|*%llu*\n", s, s);
-	r = calloc(sizeof(char), 1);
-	printf("Malloc !");
-	if (strchr(s, '\n')) //check de la presence d'un nl
-	{
-		r = ft_substr(s ,strchr(s, '\n') - s + 1, BUFFER_SIZE);
-		printf("Malloc !");
-		//tronque le premier nl
-	}
-	printf("la string restante est  devenue |%s|\n", temp);
-	while (read(fd, s, BUFFER_SIZE) > 0)
-	{
-		s[BUFFER_SIZE] = 0;
-		r = ft_strjoin(r, s);
-		printf("Malloc !");
-		if (strchr(r, '\n'))
+		while (s[i] != '\n' && i < BUFFER_SIZE + 1)
+			i++;
+		if (s[i] == '\n')
+			i++;
+		while (s[i] && i < BUFFER_SIZE + 1)
 		{
-			
-			r = ft_substr(r, 0, strchr(r, '\n') - r + 1);
-			printf("Malloc !");
-			printf("la string retournee est |%s|\n\n", r);
-			return (r);
+			s[j] = s[i];
+			i++;
+			j++;
 		}
 	}
-	return(NULL);	
+	while (j < BUFFER_SIZE + 1)
+		s[j++] = '\0';
+	//printf("Buffer clean : |%s|\n", s);
+	return (r);
 }
-/*get static */
+
+char	*get_next_line(int fd)
+{
+	static char	s[BUFFER_SIZE + 1] = {0};
+	char		*r;
+	int			readbytes;
+
+	r = calloc(sizeof(char), 1);
+	r = ft_strjoin(r, s);
+	if (ft_strchr(r, '\n') /*&& printf("a")*/)
+		return (cleanbuff(s, ft_substr(r, 0, ft_strchr(r, '\n') - r + 1)));
+	readbytes = 1;
+	while (readbytes > 0)
+	{
+		readbytes = read(fd, s, BUFFER_SIZE);
+		if (readbytes < 0)
+			break;
+		r = ft_strjoin(r, s);
+		if (ft_strchr(r, '\n') /*&& s[1] && r[1]*//*&& printf("b")*/)
+			return (cleanbuff(s, ft_substr(r, 0, ft_strchr(r, '\n') - r + 1)));
+	}
+	if (!ft_strchr(r, '\n') && s[0] /*&& r[0]*/ /*&& printf("c")*/)
+		return (cleanbuff(s, r));
+	free(r);
+	return (NULL);
+}
